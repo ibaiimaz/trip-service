@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "Stashing unstaged changes..."
+git stash --keep-index -u
+
+if npm run lint && npm run test; then
+    git stash pop
+    echo "Putting unstaged changes back..."
+else
+    git stash pop
+    echo "Putting unstaged changes back..."
+    exit 1
+fi
