@@ -7,7 +7,7 @@ import TripRepository from "./TripRepository";
 export default class TripService {
     public getTripsByUser(user: User): Trip[] {
         let tripList: Trip[] = [];
-        const loggedUser: User = UserSession.getLoggedUser();
+        const loggedUser: User | null = this.loggedInUser();
         let isFriend: boolean = false;
 
         if (loggedUser != null) {
@@ -26,5 +26,9 @@ export default class TripService {
         } else {
             throw new UserNotLoggedInException();
         }
+    }
+
+    protected loggedInUser(): User | null {
+        return UserSession.getLoggedUser();
     }
 }
