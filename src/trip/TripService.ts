@@ -19,13 +19,17 @@ export default class TripService {
             }
 
             if (isFriend) {
-                tripList = TripRepository.findTripsByUser(user);
+                tripList = this.tripsBy(user);
             }
 
             return tripList;
         } else {
             throw new UserNotLoggedInException();
         }
+    }
+
+    protected tripsBy(user: User) {
+        return TripRepository.findTripsByUser(user);
     }
 
     protected loggedInUser(): User | null {
