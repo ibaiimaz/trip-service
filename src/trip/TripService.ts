@@ -4,6 +4,8 @@ import Trip from "./Trip";
 import TripRepository from "./TripRepository";
 
 export default class TripService {
+    constructor(private tripRepository: TripRepository = new TripRepository()) {}
+
     public getTripsByUser(user: User, loggedInUser: User | null): Trip[] {
         if (loggedInUser == null) {
             throw new UserNotLoggedInException();
@@ -14,7 +16,7 @@ export default class TripService {
             : [];
     }
 
-    protected tripsBy(user: User) {
-        return TripRepository.findTripsByUser(user);
+    private tripsBy(user: User) {
+        return this.tripRepository.tripsBy(user);
     }
 }

@@ -14,8 +14,12 @@ describe("TripService", () => {
 
     let tripService: TripService;
 
+    const mockTripRepository = {
+        tripsBy: jest.fn()
+    }
+
     beforeEach(() => {
-        tripService = new TestableTripService();
+        tripService = new TripService(mockTripRepository);
     });
 
     describe("when user not logged in", () => {
@@ -45,15 +49,11 @@ describe("TripService", () => {
                                     .withTrips(TO_LONDON, TO_PARIS)
                                     .build();
 
+            mockTripRepository.tripsBy.mockReturnValue(friend.getTrips());
+
             const trips = tripService.getTripsByUser(friend, REGISTERED_USER);
     
             expect(trips).toEqual([TO_LONDON, TO_PARIS]);
         });
     });
-
-    class TestableTripService extends TripService {
-        protected tripsBy(user: User): Trip[] {
-            return user.getTrips();
-        }
-    }
 });
