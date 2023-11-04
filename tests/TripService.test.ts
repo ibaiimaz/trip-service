@@ -12,7 +12,6 @@ describe("TripService", () => {
     const TO_LONDON = new Trip();
     const TO_PARIS = new Trip();
 
-    let loggedInUser: User | null;
     let tripService: TripService;
 
     beforeEach(() => {
@@ -20,20 +19,12 @@ describe("TripService", () => {
     });
 
     describe("when user not logged in", () => {
-        beforeEach(() => {
-            loggedInUser = GUEST;
-        });
-
         it("should validate logged in user", () => {
-            expect(() => tripService.getTripsByUser(ANY_USER)).toThrow(UserNotLoggedInException)
+            expect(() => tripService.getTripsByUser(ANY_USER, GUEST)).toThrow(UserNotLoggedInException)
         });
     });
 
     describe("when user logged in", () => {
-        beforeEach(() => {
-            loggedInUser = REGISTERED_USER;
-        });
-
         it("should return no trips when the users are not friends", () => {
             const stranger: User = UserBuilder.aUser()
                                     .friendsWith(ANOTHER_USER)
@@ -43,7 +34,7 @@ describe("TripService", () => {
             stranger.addFriend(ANOTHER_USER);
             stranger.addTrip(TO_LONDON);
     
-            const trips = tripService.getTripsByUser(stranger);
+            const trips = tripService.getTripsByUser(stranger, REGISTERED_USER);
     
             expect(trips).toHaveLength(0);
         });
@@ -54,17 +45,13 @@ describe("TripService", () => {
                                     .withTrips(TO_LONDON, TO_PARIS)
                                     .build();
 
-            const trips = tripService.getTripsByUser(friend);
+            const trips = tripService.getTripsByUser(friend, REGISTERED_USER);
     
             expect(trips).toEqual([TO_LONDON, TO_PARIS]);
         });
     });
 
     class TestableTripService extends TripService {
-        protected loggedInUser(): User | null {
-            return loggedInUser;
-        }
-
         protected tripsBy(user: User): Trip[] {
             return user.getTrips();
         }

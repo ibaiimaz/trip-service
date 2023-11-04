@@ -1,26 +1,20 @@
 import UserNotLoggedInException from "../exception/UserNotLoggedInException";
 import User from "../user/User";
-import UserSession from "../user/UserSession";
 import Trip from "./Trip";
 import TripRepository from "./TripRepository";
 
 export default class TripService {
-    public getTripsByUser(user: User): Trip[] {
-        const loggedUser = this.loggedInUser();
-        if (loggedUser == null) {
+    public getTripsByUser(user: User, loggedInUser: User | null): Trip[] {
+        if (loggedInUser == null) {
             throw new UserNotLoggedInException();
         }
         
-        return user.isFriendsWith(loggedUser)
+        return user.isFriendsWith(loggedInUser)
             ? this.tripsBy(user)
             : [];
     }
 
     protected tripsBy(user: User) {
         return TripRepository.findTripsByUser(user);
-    }
-
-    protected loggedInUser(): User | null {
-        return UserSession.getLoggedUser();
     }
 }
