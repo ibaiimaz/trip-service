@@ -2,6 +2,7 @@ import UserNotLoggedInException from "../src/exception/UserNotLoggedInException"
 import Trip from "../src/trip/Trip";
 import TripService from "../src/trip/TripService";
 import User from "../src/user/User";
+import UserBuilder from "./UserBuilder";
 
 describe("TripService", () => {
     const GUEST = null;
@@ -34,7 +35,11 @@ describe("TripService", () => {
         });
 
         it("should return no trips when the users are not friends", () => {
-            const stranger = new User();
+            const stranger: User = UserBuilder.aUser()
+                                    .friendsWith(ANOTHER_USER)
+                                    .withTrips(TO_LONDON)
+                                    .build();
+
             stranger.addFriend(ANOTHER_USER);
             stranger.addTrip(TO_LONDON);
     
@@ -44,12 +49,11 @@ describe("TripService", () => {
         });
     
         it("should return trips when the users are friends", () => {
-            const friend = new User();
-            friend.addFriend(REGISTERED_USER);
-            friend.addFriend(ANOTHER_USER);
-            friend.addTrip(TO_LONDON);
-            friend.addTrip(TO_PARIS);
-    
+            const friend: User = UserBuilder.aUser()
+                                    .friendsWith(REGISTERED_USER, ANOTHER_USER)
+                                    .withTrips(TO_LONDON, TO_PARIS)
+                                    .build();
+
             const trips = tripService.getTripsByUser(friend);
     
             expect(trips).toEqual([TO_LONDON, TO_PARIS]);
