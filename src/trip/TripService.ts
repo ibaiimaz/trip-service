@@ -6,26 +6,14 @@ import TripRepository from "./TripRepository";
 
 export default class TripService {
     public getTripsByUser(user: User): Trip[] {
-        let tripList: Trip[] = [];
-        const loggedUser: User | null = this.loggedInUser();
-        let isFriend: boolean = false;
-
-        if (loggedUser != null) {
-            for (const friend of user.getFriends()) {
-                if (friend === loggedUser) {
-                    isFriend = true;
-                    break;
-                }
-            }
-
-            if (isFriend) {
-                tripList = this.tripsBy(user);
-            }
-
-            return tripList;
-        } else {
+        const loggedUser = this.loggedInUser();
+        if (loggedUser == null) {
             throw new UserNotLoggedInException();
         }
+        
+        return user.isFriendsWith(loggedUser)
+            ? this.tripsBy(user)
+            : [];
     }
 
     protected tripsBy(user: User) {
