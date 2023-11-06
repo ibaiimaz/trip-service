@@ -7,13 +7,21 @@ export default class TripService {
     constructor(private tripRepository: TripRepository = new TripRepository()) {}
 
     public getTripsByUser(user: User, loggedInUser: User | null): Trip[] {
+        this.validate(loggedInUser);
+        
+        return user.isFriendsWith(loggedInUser as User)
+            ? this.tripsBy(user)
+            : this.noTrips();
+    }
+
+    private noTrips(): Trip[] {
+        return [];
+    }
+
+    private validate(loggedInUser: User | null) {
         if (loggedInUser == null) {
             throw new UserNotLoggedInException();
         }
-        
-        return user.isFriendsWith(loggedInUser)
-            ? this.tripsBy(user)
-            : [];
     }
 
     private tripsBy(user: User) {

@@ -22,38 +22,34 @@ describe("TripService", () => {
         tripService = new TripService(mockTripRepository);
     });
 
-    describe("when user not logged in", () => {
-        it("should validate logged in user", () => {
-            expect(() => tripService.getTripsByUser(ANY_USER, GUEST)).toThrow(UserNotLoggedInException)
-        });
+    it("should validate logged in user", () => {
+        expect(() => tripService.getTripsByUser(ANY_USER, GUEST)).toThrow(UserNotLoggedInException)
     });
 
-    describe("when user logged in", () => {
-        it("should return no trips when the users are not friends", () => {
-            const stranger: User = UserBuilder.aUser()
-                                    .friendsWith(ANOTHER_USER)
-                                    .withTrips(TO_LONDON)
-                                    .build();
+    it("should return no trips when the users are not friends", () => {
+        const stranger: User = UserBuilder.aUser()
+                                .friendsWith(ANOTHER_USER)
+                                .withTrips(TO_LONDON)
+                                .build();
 
-            stranger.addFriend(ANOTHER_USER);
-            stranger.addTrip(TO_LONDON);
-    
-            const trips = tripService.getTripsByUser(stranger, REGISTERED_USER);
-    
-            expect(trips).toHaveLength(0);
-        });
-    
-        it("should return trips when the users are friends", () => {
-            const friend: User = UserBuilder.aUser()
-                                    .friendsWith(REGISTERED_USER, ANOTHER_USER)
-                                    .withTrips(TO_LONDON, TO_PARIS)
-                                    .build();
+        stranger.addFriend(ANOTHER_USER);
+        stranger.addTrip(TO_LONDON);
 
-            mockTripRepository.tripsBy.mockReturnValue(friend.getTrips());
+        const trips = tripService.getTripsByUser(stranger, REGISTERED_USER);
 
-            const trips = tripService.getTripsByUser(friend, REGISTERED_USER);
-    
-            expect(trips).toEqual([TO_LONDON, TO_PARIS]);
-        });
+        expect(trips).toHaveLength(0);
+    });
+
+    it("should return trips when the users are friends", () => {
+        const friend: User = UserBuilder.aUser()
+                                .friendsWith(REGISTERED_USER, ANOTHER_USER)
+                                .withTrips(TO_LONDON, TO_PARIS)
+                                .build();
+
+        mockTripRepository.tripsBy.mockReturnValue(friend.getTrips());
+
+        const trips = tripService.getTripsByUser(friend, REGISTERED_USER);
+
+        expect(trips).toEqual([TO_LONDON, TO_PARIS]);
     });
 });
